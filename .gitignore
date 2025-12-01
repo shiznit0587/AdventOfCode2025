@@ -1,0 +1,6 @@
+# Zig build artifacts and cache
+.zig-cache/
+zig-out/
+
+# Operating system and editor specific files (consider a global .gitignore for these)
+.DS_Store
