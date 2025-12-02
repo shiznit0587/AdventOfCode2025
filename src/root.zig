@@ -8,16 +8,16 @@ pub fn run() !void {
 
     var timer = try std.time.Timer.start();
 
-    try runDay(1, &day1.run);
+    try runDay(1, day1.run);
 
     std.debug.print("Total Time = {} ms\n", .{@divFloor(timer.read(), std.time.ns_per_ms)});
     std.debug.print("\n", .{});
 }
 
-fn runDay(day: usize, runFn: *const fn () void) !void {
+fn runDay(day: usize, runFn: fn () anyerror!void) !void {
     std.debug.print("Running Day {}...\n", .{day});
 
     var timer = try std.time.Timer.start();
-    runFn();
+    try runFn();
     std.debug.print("Day {} Time = {} ms\n\n", .{ day, @divFloor(timer.read(), std.time.ns_per_ms) });
 }

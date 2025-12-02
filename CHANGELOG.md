@@ -1,5 +1,9 @@
 # Day 1
 
+I got the basics in place. There's a function that takes a lambda to run each day while timing it.
+
+I decided to use the Raptor Mini AI coding agent with this project, to help me hit the ground running in zig. I've never used an AI in Agent mode before, I'd only used in Ask mode. It's quite a different experience, allowing the AI to run commands, edit files, etc. It's been somewhat helpful. It gave me multiple approaches to reading in the lines of a file and explaining how memory ownership is managed. However, it took a lot of iteration on its own to get results that compiled, and the end results were unneccesarily convoluted. It never used a file reader or buffered reader; it just did the raw reads, buffer management, overflow management, and container resizing manually. So far, I would not hire this AI for a job.
+
 # Project Setup
 
 > `brew install zig`
