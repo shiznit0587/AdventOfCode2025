@@ -9,12 +9,35 @@ pub fn run() !void {
 
     std.debug.print("  Day 1 - Part 1\n", .{});
 
-    // Example: iterate owned lines
-    var idx: usize = 0;
+    var dial: i32 = 50;
+    var password1: u32 = 0;
+    var password2: u32 = 0;
+
     for (lines.lines) |line| {
-        std.debug.print("    pushed line {}: {s}\n", .{ idx, line });
-        idx += 1;
+        const step = try std.fmt.parseInt(i32, line[1..], 10);
+
+        dial = switch (line[0]) {
+            'L' => (dial - step),
+            'R' => (dial + step),
+            else => dial,
+        };
+
+        while (dial < 0) {
+            dial += 100;
+            password2 += 1;
+        }
+
+        while (dial >= 100) {
+            dial -= 100;
+            password2 += 1;
+        }
+
+        if (dial == 0) {
+            password1 += 1;
+        }
     }
 
+    std.debug.print("    Password: {d}\n", .{password1});
     std.debug.print("  Day 1 - Part 2\n", .{});
+    std.debug.print("    Password: {d}\n", .{password2});
 }

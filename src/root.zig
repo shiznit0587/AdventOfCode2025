@@ -10,7 +10,7 @@ pub fn run() !void {
 
     try runDay(1, day1.run);
 
-    std.debug.print("Total Time = {} ms\n", .{@divFloor(timer.read(), std.time.ns_per_ms)});
+    std.debug.print("Total Time = {d:.3} ms\n", .{@as(f64, @floatFromInt(timer.read())) / std.time.ns_per_ms});
     std.debug.print("\n", .{});
 }
 
@@ -19,5 +19,5 @@ fn runDay(day: usize, runFn: fn () anyerror!void) !void {
 
     var timer = try std.time.Timer.start();
     try runFn();
-    std.debug.print("Day {} Time = {} ms\n\n", .{ day, @divFloor(timer.read(), std.time.ns_per_ms) });
+    std.debug.print("Day {} Time = {d:.3} ms\n\n", .{ day, @as(f64, @floatFromInt(timer.read())) / std.time.ns_per_ms });
 }
