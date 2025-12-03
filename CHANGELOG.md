@@ -1,3 +1,13 @@
+# Day 2
+
+The AI coding agent was terrible for this day. It kept trying to generate invalid reverse-iterating for loops, using wrong number types for variables, etc. It was just getting it my way.
+
+For the puzzle itself, I had two ideas for a solution:
+1. Convert each number between the range bounds to a string and compare the two halves.
+2. Convert each number between the range bounds to a list of digits and compare the two halves.
+
+I went with option 2. I'm kind of regretting it, as the solution takes >8s to run.
+
 # Day 1
 
 I got the basics in place. There's a function that takes a lambda to run each day while timing it.
