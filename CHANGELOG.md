@@ -8,6 +8,10 @@ For the puzzle itself, I had two ideas for a solution:
 
 I went with option 2. I'm kind of regretting it, as the solution takes >8s to run.
 
+For part 2, I came up with a completely different approach. For each range, for each length of repeated digits, I iterate between the min and max for the repeated section, expand it out to the correct number of digits, then check if the generated number is still in the range. Then I had to add tracking for seen values, as 222222 was being counted three times - as 2 repeated, 22 repeated, and 222 repeated. The final solution for Day 2 runs in .7 ms!
+
+I'm beginning to dislike this language, at least for these puzzles. The compiler makes it a point to require the programmer to be tediously explicit; with valuetype casts, with integer division, with const correctness; it doesn't let any ambiguity through. There's also the fact that every single allocation must be "tried". I'm sure for systems programming it's important to be able to recover or repair gracefully when system resources are low, but it's unneccessary for this type of project.
+
 # Day 1
 
 I got the basics in place. There's a function that takes a lambda to run each day while timing it.
@@ -16,7 +20,7 @@ I decided to use the Raptor Mini AI coding agent with this project, to help me h
 
 It didn't help that zig had an overhaul of its I/O library recently (dubbed "writergate"), which has rendered forum posts, blog posts, stack overflow posts, documentation, and trained AI models obsolete. And the new library was having issues internally as well, so that was fun.
 
-Once I finished the `util.readLines` method, the actual puzzle only took ten minutes.
+Once I finished the `util.readLines` method, the actual puzzle only took ten minutes and runs in .5 ms.
 
 # Project Setup
 
