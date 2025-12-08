@@ -1,6 +1,8 @@
 const std = @import("std");
 const util = @import("../util.zig");
 
+const Range = struct { start: usize, end: usize };
+
 pub fn run() !void {
     const gpa = std.heap.page_allocator;
 
@@ -9,11 +11,12 @@ pub fn run() !void {
 
     std.debug.print("  Day 2 - Part 1\n", .{});
 
-    var ranges = std.ArrayList([]usize).empty;
+    var ranges = std.ArrayList(Range).empty;
 
     // I need to handle seeing the same number more than once.
     // Example: 222222 is 2 repeated, 22 repeated, and 222 repeated.
-    var addedNumbers = std.ArrayList(usize).empty;
+    var addedNumbers = std.AutoHashMap(usize, void).init(gpa);
+    defer addedNumbers.deinit();
 
     var splitIterator = std.mem.splitScalar(u8, lines.lines[0], ',');
     while (splitIterator.next()) |range| {
@@ -28,9 +31,7 @@ pub fn run() !void {
     var sumPart1: usize = 0;
     var sumPart2: usize = 0;
     for (ranges.items) |range| {
-        const start = range[0];
-        const end = range[1];
-        const numLen = digitCount(start);
+        const numLen = digitCount(range.start);
         const maxDoodooLength = @divFloor(numLen, 2);
 
         for (1..maxDoodooLength + 1) |doodooLength| {
@@ -38,15 +39,15 @@ pub fn run() !void {
                 continue;
             }
 
-            const topDoodooFactor = powInt(10, numLen - doodooLength);
-            const minDoodoo = @divFloor(start, topDoodooFactor);
-            const maxDoodoo = @divFloor(end, topDoodooFactor);
+            const topDoodooFactor = try std.math.powi(usize, 10, numLen - doodooLength);
+            const minDoodoo = @divFloor(range.start, topDoodooFactor);
+            const maxDoodoo = @divFloor(range.end, topDoodooFactor);
 
-            const doodooFactor = powInt(10, doodooLength);
+            const doodooFactor = try std.math.powi(usize, 10, doodooLength);
 
             // mahna-mahna
             for (minDoodoo..maxDoodoo + 1) |doodoo| {
-                // calculate FULL DOODOO : TODO: make this a helper function
+                // calculate FULL DOODOO
                 var fullDoodoo = doodoo;
                 var fullDoodooLength = doodooLength;
                 while (fullDoodooLength < numLen) {
@@ -54,8 +55,8 @@ pub fn run() !void {
                     fullDoodooLength += doodooLength;
                 }
 
-                if (start <= fullDoodoo and fullDoodoo <= end and !has(&addedNumbers, fullDoodoo)) {
-                    try addedNumbers.append(gpa, fullDoodoo);
+                if (range.start <= fullDoodoo and fullDoodoo <= range.end and !addedNumbers.contains(fullDoodoo)) {
+                    try addedNumbers.put(fullDoodoo, {});
 
                     if (doodooLength == maxDoodooLength and numLen % 2 == 0) {
                         sumPart1 += fullDoodoo;
@@ -73,26 +74,17 @@ pub fn run() !void {
 }
 
 /// Add ranges split based on the number of digits, ensuring the minx/max of all ranges are the same length.
-fn checkAndAddRange(ranges: *std.ArrayList([]usize), gpa: std.mem.Allocator, start: usize, end: usize) !void {
+fn checkAndAddRange(ranges: *std.ArrayList(Range), gpa: std.mem.Allocator, start: usize, end: usize) !void {
     const startDigits = digitCount(start);
     const endDigits = digitCount(end);
 
     if (startDigits == endDigits) {
-        // TODO: See if there's a less-verbose way to allocate this array and add it to the list
-        // or if there's tuple support
-        var range = try gpa.alloc(usize, 2);
-        range[0] = start;
-        range[1] = end;
-        try ranges.append(gpa, range);
+        try ranges.append(gpa, Range{ .start = start, .end = end });
     } else {
-        const newStart = powInt(10, startDigits);
+        const newStart = try std.math.powi(usize, 10, startDigits);
         const newEnd = newStart - 1;
 
-        var range = try gpa.alloc(usize, 2);
-        range[0] = start;
-        range[1] = newEnd;
-
-        try ranges.append(gpa, range);
+        try ranges.append(gpa, Range{ .start = start, .end = newEnd });
         try checkAndAddRange(ranges, gpa, newStart, end);
     }
 }
@@ -104,23 +96,4 @@ fn digitCount(num: usize) usize {
         count += 1;
     }
     return count;
-}
-
-// TODO: See if there's a std version of this
-fn powInt(base: usize, power: usize) usize {
-    return switch (power) {
-        0 => 1,
-        1 => base,
-        else => base * powInt(base, power - 1),
-    };
-}
-
-// TODO: See if there's a std version of this (or a Set type)
-fn has(list: *std.ArrayList(usize), val: usize) bool {
-    for (list.items) |item| {
-        if (item == val) {
-            return true;
-        }
-    }
-    return false;
 }
