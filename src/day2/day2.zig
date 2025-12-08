@@ -32,37 +32,36 @@ pub fn run() !void {
     var sumPart2: usize = 0;
     for (ranges.items) |range| {
         const numLen = digitCount(range.start);
-        const maxDoodooLength = @divFloor(numLen, 2);
+        const maxRepeatedLen = @divFloor(numLen, 2);
 
-        for (1..maxDoodooLength + 1) |doodooLength| {
-            if (numLen % doodooLength != 0) {
+        for (1..maxRepeatedLen + 1) |repeatedLen| {
+            if (numLen % repeatedLen != 0) {
                 continue;
             }
 
-            const topDoodooFactor = try std.math.powi(usize, 10, numLen - doodooLength);
-            const minDoodoo = @divFloor(range.start, topDoodooFactor);
-            const maxDoodoo = @divFloor(range.end, topDoodooFactor);
+            const highDigitsDivisor = try std.math.powi(usize, 10, numLen - repeatedLen);
+            const minRepeated = @divFloor(range.start, highDigitsDivisor);
+            const maxRepeated = @divFloor(range.end, highDigitsDivisor);
 
-            const doodooFactor = try std.math.powi(usize, 10, doodooLength);
+            const repeatMultiplier = try std.math.powi(usize, 10, repeatedLen);
 
-            // mahna-mahna
-            for (minDoodoo..maxDoodoo + 1) |doodoo| {
-                // calculate FULL DOODOO
-                var fullDoodoo = doodoo;
-                var fullDoodooLength = doodooLength;
-                while (fullDoodooLength < numLen) {
-                    fullDoodoo = fullDoodoo * doodooFactor + doodoo;
-                    fullDoodooLength += doodooLength;
+            for (minRepeated..maxRepeated + 1) |repeated| {
+                // Flood repeated segment into lower digits of candidate until it reaches the full length.
+                var candidate = repeated;
+                var candidateLength = repeatedLen;
+                while (candidateLength < numLen) {
+                    candidate = candidate * repeatMultiplier + repeated;
+                    candidateLength += repeatedLen;
                 }
 
-                if (range.start <= fullDoodoo and fullDoodoo <= range.end and !addedNumbers.contains(fullDoodoo)) {
-                    try addedNumbers.put(fullDoodoo, {});
+                if (range.start <= candidate and candidate <= range.end and !addedNumbers.contains(candidate)) {
+                    try addedNumbers.put(candidate, {});
 
-                    if (doodooLength == maxDoodooLength and numLen % 2 == 0) {
-                        sumPart1 += fullDoodoo;
+                    if (repeatedLen == maxRepeatedLen and numLen % 2 == 0) {
+                        sumPart1 += candidate;
                     }
 
-                    sumPart2 += fullDoodoo;
+                    sumPart2 += candidate;
                 }
             }
         }
