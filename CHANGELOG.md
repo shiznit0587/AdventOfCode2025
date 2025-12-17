@@ -1,3 +1,7 @@
+# Day 3
+
+I didn't find Day 3 at all challenging. By using character subtraction, I never needed to perform any full string -> number conversion, and indexing into the line for single digits was super quick.
+
 # Day 2
 
 The AI coding agent was terrible for this day. It kept trying to generate invalid reverse-iterating for loops, using wrong number types for variables, etc. It was just getting it my way.
