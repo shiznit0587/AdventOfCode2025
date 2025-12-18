@@ -1,3 +1,7 @@
+# Day 4
+
+I'm really over zig's incessant safety. Any time I want to use a for loop with negative numbers, or with an increment of anything other than a usize, I have to jump through hoops. I can't just use an i32 as an indexer, it must be a usize. It takes two builtin functions for every cast. It's just extra code the compiler could already deduce.
+
 # Day 3
 
 I didn't find Day 3 at all challenging. By using character subtraction, I never needed to perform any full string -> number conversion, and indexing into the line for single digits was super quick.
