@@ -29,3 +29,33 @@ pub fn readLines(gpa: std.mem.Allocator, path: []const u8) !ReadLinesResult {
 
     return .{ .lines = try lines.toOwnedSlice(gpa), .data = data };
 }
+
+pub const MutableLinesResult = struct {
+    lines: [][]u8,
+
+    pub fn deinit(self: *MutableLinesResult, gpa: std.mem.Allocator) void {
+        for (self.lines) |line| {
+            gpa.free(line);
+        }
+        gpa.free(self.lines);
+    }
+};
+
+pub fn readLinesMutable(gpa: std.mem.Allocator, path: []const u8) !MutableLinesResult {
+    const file = try std.fs.cwd().openFile(path, .{ .mode = .read_only });
+    defer file.close();
+
+    const data = try file.readToEndAlloc(gpa, std.math.maxInt(usize));
+    defer gpa.free(data);
+
+    var lines = std.ArrayList([]u8).empty;
+
+    var splitIterator = std.mem.splitScalar(u8, data, '\n');
+    while (splitIterator.next()) |line| {
+        const mut_line = try gpa.alloc(u8, line.len);
+        @memcpy(mut_line, line);
+        try lines.append(gpa, mut_line);
+    }
+
+    return .{ .lines = try lines.toOwnedSlice(gpa) };
+}
