@@ -1,3 +1,7 @@
+# Day 5
+
+I kept having an issue where after my code to merge ranges, it looked as though no changes had been made to them. I needed to take a pointer to the ranges in the list, otherwise I was modifying a copy. Beginner mistake.
+
 # Day 4
 
 I'm really over zig's incessant safety. Any time I want to use a for loop with negative numbers, or with an increment of anything other than a usize, I have to jump through hoops. I can't just use an i32 as an indexer, it must be a usize. It takes two builtin functions for every cast. It's just extra code the compiler could already deduce.
