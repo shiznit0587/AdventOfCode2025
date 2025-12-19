@@ -6,6 +6,8 @@ I kept having an issue where after my code to merge ranges, it looked as though 
 
 I'm really over zig's incessant safety. Any time I want to use a for loop with negative numbers, or with an increment of anything other than a usize, I have to jump through hoops. I can't just use an i32 as an indexer, it must be a usize. It takes two builtin functions for every cast. It's just extra code the compiler could already deduce.
 
+I went back and attempted multiple algorithm changes to optimize this. It was taking 48ms. I reworked it to edit the lines in place, and that brought it down to 40ms. I tried changing it to tracking a queue of coords to process, removing all full scans of the grid. I tried implementing my own linked list. I tried converting from [][]u8 to [][]bool. I tried pre-caching all the adjacent coords with rolls per starting roll. I tried keeping lists of adjacent rolls in a map. That last one took longer just to build the data structure. I could not for the life of me figure out a way to make this solution faster.
+
 # Day 3
 
 I didn't find Day 3 at all challenging. By using character subtraction, I never needed to perform any full string -> number conversion, and indexing into the line for single digits was super quick.
