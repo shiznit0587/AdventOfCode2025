@@ -1,3 +1,7 @@
+# Day 7
+
+That felt trivial compared to the other days so far, and for the first time, the language didn't really get in my way.
+
 # Day 6
 
 I tried to save processing time by implementing a version of `utils.readLines` that takes a lambda, and writing one for parsing the lines out into operands for equations. zig is extremely limited in what a "lambda" can do. First off, it must be a member of a type. Second, it can't access any state. Third, there's no way to bind arguments to a function.
@@ -14,7 +18,7 @@ I kept having an issue where after my code to merge ranges, it looked as though 
 
 I'm really over zig's incessant safety. Any time I want to use a for loop with negative numbers, or with an increment of anything other than a usize, I have to jump through hoops. I can't just use an i32 as an indexer, it must be a usize. It takes two builtin functions for every cast. It's just extra code the compiler could already deduce.
 
-I went back and attempted multiple algorithm changes to optimize this day. It was taking 48ms. I reworked it to edit the lines in place, and that brought it down to 40ms. I tried changing it to tracking a queue of coords to process, removing all full scans of the grid. I tried implementing my own linked list. I tried converting from [][]u8 to [][]bool. I tried pre-caching all the adjacent coords with rolls per starting roll. I tried keeping lists of adjacent rolls in a map. That last one took longer just to build the data structure. I could not for the life of me figure out a way to make this solution faster.
+I went back and attempted multiple algorithm changes to optimize this day. It was taking 48ms. I reworked it to edit the lines in place, and that brought it down to 40ms. I tried changing it to tracking a queue of coords to process, removing all full scans of the grid. I tried implementing my own linked list. I tried converting from [][]u8 to [][]bool. I tried pre-caching all the adjacent coords with rolls per starting roll. I tried keeping lists of adjacent rolls in a map. That last one took longer just to build the data structure. Then I ported a double-buffered solution I'd seen elsewhere, reducing heap alloc calls to just two. That was ~200ms. I can not for the life of me figure out a way to make this solution faster.
 
 # Day 3
 
