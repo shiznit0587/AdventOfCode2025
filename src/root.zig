@@ -9,6 +9,7 @@ const day5 = @import("day5/day5.zig");
 const day6 = @import("day6/day6.zig");
 const day7 = @import("day7/day7.zig");
 const day8 = @import("day8/day8.zig");
+const day9 = @import("day9/day9.zig");
 
 pub fn run() !void {
     std.debug.print("\n🎅🎅🎅🎅🎅 ADVENT OF CODE 2025 🎅🎅🎅🎅🎅\n\n", .{});
@@ -23,6 +24,7 @@ pub fn run() !void {
     try runDay(6, day6.run);
     try runDay(7, day7.run);
     try runDay(8, day8.run);
+    try runDay(9, day9.run);
 
     std.debug.print("Total Time = {d:.3} ms\n", .{@as(f64, @floatFromInt(timer.read())) / std.time.ns_per_ms});
     std.debug.print("\n", .{});
