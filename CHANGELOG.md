@@ -1,3 +1,11 @@
+# Day 9
+
+Part 2 of this day was definitely the weeding-out puzzle. I tried some computational geometry algorithms from "Introduction to Algorithms: Second Edition" for finding whether edges intersect via a direction calculated from cross products. With all edges being strictly vertical or horizontal and the values being whole integers, the standard algorithms just broke down on me. I probably forgot to do some type-casting. There was also the issue that "intersects" in the traditional sense includes the case of an endpoint from one edge being along the other edge, but that's allowed here as long as the edge doesn't extend into the rect's region. I spent three days on this solution, and I still think it's not 100% correct. I think that the rect formed by the points `2,5` and `9,7` in the example would also pass my checks, but it is entirely _outside_ the region formed by the edges. It happens to have the same area as the proper solution though, so my testing didn't catch it.
+
+# Day 8
+
+Not much to say this day, just that I hit an issue again with modifying a copy instead of the contents within a list.
+
 # Day 7
 
 That felt trivial compared to the other days so far, and for the first time, the language didn't really get in my way.
