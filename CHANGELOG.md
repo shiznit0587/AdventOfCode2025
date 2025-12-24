@@ -1,3 +1,18 @@
+# Day 10
+
+I decided to try bringing in a regex library for the input parsing. Dependency management in zig is... a mess. There's multiple package indexes and multiple package managers. It appeared at though the only "official" way to have a dependency is via a git submodule. Most blog posts covering the topic are from 2023, and the build system's API seems to have changed since then. Even Github's own GPT-5 mini model gave me bad advice, suggesting an `addPackagePath` API on the builder that no longer (?) exists.
+
+- [zigistry](https://zigistry.dev)zig
+- [Zigmod](https://nektro.github.io/zigmod/)
+- [aquila](https://aquila.red)
+- [zig.pm](https://zig.pm)
+
+I managed to use a combination of the installation instructions from [zig-regex](https://github.com/zig-utils/zig-regex) itself and from the robust [zap](https://github.com/zigzap/zap) project for web backends. I ran:
+```
+zig fetch --save https://github.com/zig-utils/zig-regex/archive/main.tar.gz
+```
+which added the dependency to my `build.zig.zon` (Zig Object Notation) file, and then adding the module as an import dependency to my project's module. _But not the main module_, which was separated out in my `buid.zig` file by Copilot when I first started this project.
+
 # Day 9
 
 Part 2 of this day was definitely the weeding-out puzzle. I tried some computational geometry algorithms from "Introduction to Algorithms: Second Edition" for finding whether edges intersect via a direction calculated from cross products. With all edges being strictly vertical or horizontal and the values being whole integers, the standard algorithms just broke down on me. I probably forgot to do some type-casting. There was also the issue that "intersects" in the traditional sense includes the case of an endpoint from one edge being along the other edge, but that's allowed here as long as the edge doesn't extend into the rect's region. I spent three days on this solution, and I still think it's not 100% correct. I think that the rect formed by the points `2,5` and `9,7` in the example would also pass my checks, but it is entirely _outside_ the region formed by the edges. It happens to have the same area as the proper solution though, so my testing didn't catch it.
