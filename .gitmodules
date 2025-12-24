@@ -1,3 +1,0 @@
-[submodule "deps/zig-regex"]
-	path = deps/zig-regex
-	url = https://github.com/zig-utils/zig-regex.git
