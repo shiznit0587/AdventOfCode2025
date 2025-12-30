@@ -18,31 +18,30 @@ pub fn run() !void {
         var num: usize = 0;
         var button: Button = Button.initEmpty();
         for (line) |c| {
-            if (c == '{') {
-                parsingJoltages = true;
-            } else if (c == '}') {
-                try machine.joltages.append(gpa, num);
-            } else if (c == '.') {
-                lightId += 1;
-            } else if (c == '#') {
-                machine.lights.set(lightId);
-                lightId += 1;
-            } else if (c == '(') {
-                button = Button.initEmpty();
-            } else if (c == ')') {
-                button.set(num);
-                num = 0;
-                try machine.buttons.append(gpa, button);
-            } else if ('0' <= c and c <= '9') {
-                num = num * 10 + c - '0';
-            } else if (c == ',') {
-                if (!parsingJoltages) {
+            switch (c) {
+                '{' => parsingJoltages = true,
+                '}' => try machine.joltages.append(gpa, num),
+                '.' => lightId += 1,
+                '#' => {
+                    machine.lights.set(lightId);
+                    lightId += 1;
+                },
+                '(' => button = Button.initEmpty(),
+                ')' => {
                     button.set(num);
                     num = 0;
-                } else {
-                    try machine.joltages.append(gpa, num);
+                    try machine.buttons.append(gpa, button);
+                },
+                '0'...'9' => num = num * 10 + c - '0',
+                ',' => {
+                    if (!parsingJoltages) {
+                        button.set(num);
+                    } else {
+                        try machine.joltages.append(gpa, num);
+                    }
                     num = 0;
-                }
+                },
+                else => {},
             }
         }
 
