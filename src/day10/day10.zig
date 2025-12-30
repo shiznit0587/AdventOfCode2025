@@ -1,6 +1,5 @@
 const std = @import("std");
 const util = @import("../util.zig");
-const Regex = @import("regex").Regex;
 
 pub fn run() !void {
     const gpa = std.heap.page_allocator;
@@ -10,41 +9,40 @@ pub fn run() !void {
 
     std.debug.print("  Day 10 - Part 1\n", .{});
 
-    var regex = try Regex.compile(gpa, "\\[([\\.#]+)\\] (\\(.*\\)) \\{(.*)\\}");
-    defer regex.deinit();
-
     var machines = try std.ArrayList(Machine).initCapacity(gpa, rlr.lines.len);
     for (rlr.lines) |line| {
         var machine: Machine = .{};
 
-        if (try regex.find(line)) |match| {
-            const lightsStr = match.captures[0];
-            const buttonsStr = match.captures[1];
-            const joltagesStr = match.captures[2];
-
-            for (0..lightsStr.len) |i| {
-                if (lightsStr[i] == '#') {
-                    machine.lights.set(i);
+        var parsingJoltages = false;
+        var lightId: usize = 0;
+        var num: usize = 0;
+        var button: Button = Button.initEmpty();
+        for (line) |c| {
+            if (c == '{') {
+                parsingJoltages = true;
+            } else if (c == '}') {
+                try machine.joltages.append(gpa, num);
+            } else if (c == '.') {
+                lightId += 1;
+            } else if (c == '#') {
+                machine.lights.set(lightId);
+                lightId += 1;
+            } else if (c == '(') {
+                button = Button.initEmpty();
+            } else if (c == ')') {
+                button.set(num);
+                num = 0;
+                try machine.buttons.append(gpa, button);
+            } else if ('0' <= c and c <= '9') {
+                num = num * 10 + c - '0';
+            } else if (c == ',') {
+                if (!parsingJoltages) {
+                    button.set(num);
+                    num = 0;
+                } else {
+                    try machine.joltages.append(gpa, num);
+                    num = 0;
                 }
-            }
-
-            var btnsIter = std.mem.splitScalar(u8, buttonsStr, ' ');
-            while (btnsIter.next()) |btnStr| {
-                var btn: Button = Button.initEmpty();
-
-                var btnIter = std.mem.splitScalar(u8, btnStr[1 .. btnStr.len - 1], ',');
-                while (btnIter.next()) |lightIdStr| {
-                    const lightId = try std.fmt.parseInt(u64, lightIdStr, 10);
-                    btn.set(lightId);
-                }
-
-                try machine.buttons.append(gpa, btn);
-            }
-
-            var joltageIter = std.mem.splitScalar(u8, joltagesStr, ',');
-            while (joltageIter.next()) |joltageStr| {
-                const joltage = try std.fmt.parseInt(u64, joltageStr, 10);
-                try machine.joltages.append(gpa, joltage);
             }
         }
 
