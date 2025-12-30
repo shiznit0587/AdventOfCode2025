@@ -19,6 +19,16 @@ For the problem itself, I stored the lights state and button modifier as single 
 
 I cleaned up the Part 1 solution a bit. Now that I'm tracking less state for debugging purposes, it's down to ~510ms. I also switched to using zig's `StaticBitSet` instead of doing all the bit operations by hand.
 
+For Part 2, I've found two possible algorithms on Reddit:
+- [Bifurcate Your Way to Victory](https://www.reddit.com/r/adventofcode/comments/1pk87hl/)
+- [Solution without using a 3rd party solver](https://www.reddit.com/r/adventofcode/comments/1pp98cr/)
+
+I spent days implementing a version of the first, because it felt more like it built on the existing part 1. After multiple modifications, it finally ran successfully, finding solutions for all days. The solutions however were non-optimal, _and_ it took 109 mins to run.
+
+I also realized my debugger wasn't actually using the pretty printer I thought I had installed before. I needed to get lldb using python3, and configured to load in and make available the zig pretty printer python script. It was quite the effort, but now I finally see more than just pointer values!
+
+I've now replaced the regex I worked so hard to pull a library in for with manual parsing code, and the parse time went down from ~500ms to .7ms!
+
 # Day 9
 
 Part 2 of this day was definitely the weeding-out puzzle. I tried some computational geometry algorithms from "Introduction to Algorithms: Second Edition" for finding whether edges intersect via a direction calculated from cross products. With all edges being strictly vertical or horizontal and the values being whole integers, the standard algorithms just broke down on me. I probably forgot to do some type-casting. There was also the issue that "intersects" in the traditional sense includes the case of an endpoint from one edge being along the other edge, but that's allowed here as long as the edge doesn't extend into the rect's region. I spent three days on this solution, and I still think it's not 100% correct. I think that the rect formed by the points `2,5` and `9,7` in the example would also pass my checks, but it is entirely _outside_ the region formed by the edges. It happens to have the same area as the proper solution though, so my testing didn't catch it.
@@ -135,3 +145,4 @@ Once I finished the `util.readLines` method, the actual puzzle only took ten min
 - https://ziggit.dev/
 - https://zigistry.dev/programs/github/zig-utils/zig-regex/
 - https://ziggit.dev/t/debugging-zig-with-a-debugger/7160/
+- https://github.com/zigcc/awesome-zig
