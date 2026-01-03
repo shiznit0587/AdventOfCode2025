@@ -28,6 +28,18 @@ pub fn run() !void {
     std.debug.print("    Num paths = {}\n", .{paths});
 
     std.debug.print("  Day 11 - Part 2\n", .{});
+
+    const svrToDac = try _dfs("svr", "dac", deviceMap, &visited, 0);
+    const dacToFft = try _dfs("dac", "fft", deviceMap, &visited, 0);
+    const fftToOut = try _dfs("fft", "out", deviceMap, &visited, 0);
+    const paths1 = svrToDac * dacToFft * fftToOut;
+
+    const svrToFft = try _dfs("svr", "fft", deviceMap, &visited, 0);
+    const fftToDac = try _dfs("fft", "dac", deviceMap, &visited, 0);
+    const dacToOut = try _dfs("dac", "out", deviceMap, &visited, 0);
+    const paths2 = svrToFft * fftToDac * dacToOut;
+
+    std.debug.print("    Num paths = {}\n", .{paths1 + paths2});
 }
 
 fn _dfs(node: String, dest: String, graph: std.StringHashMap(std.ArrayList(String)), visited: *std.StringHashMap(void), count: usize) !usize {
@@ -38,9 +50,12 @@ fn _dfs(node: String, dest: String, graph: std.StringHashMap(std.ArrayList(Strin
     var result = count;
     try visited.put(node, {});
 
-    for (graph.getPtr(node).?.items) |next| {
-        if (!visited.contains(next)) {
-            result += try _dfs(next, dest, graph, visited, count);
+    const neighbors = graph.getPtr(node);
+    if (neighbors) |n| {
+        for (n.items) |next| {
+            if (!visited.contains(next)) {
+                result += try _dfs(next, dest, graph, visited, count);
+            }
         }
     }
 
