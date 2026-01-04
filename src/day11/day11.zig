@@ -23,28 +23,32 @@ pub fn run() !void {
     std.debug.print("  Day 11 - Part 1\n", .{});
 
     var visited = std.StringHashMap(void).init(gpa);
-    const paths = try _dfs("you", "out", deviceMap, &visited, 0);
+
+    var path = std.ArrayList(String).empty;
+    try path.append(gpa, "out");
+    const paths = try _dfs("you", path.items, deviceMap, &visited, 0);
 
     std.debug.print("    Num paths = {}\n", .{paths});
 
     std.debug.print("  Day 11 - Part 2\n", .{});
 
-    const svrToDac = try _dfs("svr", "dac", deviceMap, &visited, 0);
-    const dacToFft = try _dfs("dac", "fft", deviceMap, &visited, 0);
-    const fftToOut = try _dfs("fft", "out", deviceMap, &visited, 0);
-    const paths1 = svrToDac * dacToFft * fftToOut;
+    path.clearRetainingCapacity();
+    try path.appendSlice(gpa, &[_](String){ "dac", "fft", "out" });
+    const paths1 = try _dfs("svr", path.items, deviceMap, &visited, 0);
 
-    const svrToFft = try _dfs("svr", "fft", deviceMap, &visited, 0);
-    const fftToDac = try _dfs("fft", "dac", deviceMap, &visited, 0);
-    const dacToOut = try _dfs("dac", "out", deviceMap, &visited, 0);
-    const paths2 = svrToFft * fftToDac * dacToOut;
+    path.clearRetainingCapacity();
+    try path.appendSlice(gpa, &[_](String){ "fft", "dac", "out" });
+    const paths2 = try _dfs("svr", path.items, deviceMap, &visited, 0);
 
     std.debug.print("    Num paths = {}\n", .{paths1 + paths2});
 }
 
-fn _dfs(node: String, dest: String, graph: std.StringHashMap(std.ArrayList(String)), visited: *std.StringHashMap(void), count: usize) !usize {
-    if (std.mem.eql(u8, node, dest)) {
-        return count + 1;
+fn _dfs(node: String, path: []String, graph: std.StringHashMap(std.ArrayList(String)), visited: *std.StringHashMap(void), count: usize) !usize {
+    if (std.mem.eql(u8, node, path[0])) {
+        if (path.len == 1) {
+            return count + 1;
+        }
+        return _dfs(node, path[1..], graph, visited, count);
     }
 
     var result = count;
@@ -54,7 +58,7 @@ fn _dfs(node: String, dest: String, graph: std.StringHashMap(std.ArrayList(Strin
     if (neighbors) |n| {
         for (n.items) |next| {
             if (!visited.contains(next)) {
-                result += try _dfs(next, dest, graph, visited, count);
+                result += try _dfs(next, path, graph, visited, count);
             }
         }
     }
