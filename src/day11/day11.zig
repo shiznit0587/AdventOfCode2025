@@ -22,48 +22,54 @@ pub fn run() !void {
 
     std.debug.print("  Day 11 - Part 1\n", .{});
 
-    var visited = std.StringHashMap(void).init(gpa);
-
-    var path = std.ArrayList(String).empty;
-    try path.append(gpa, "out");
-    const paths = try _dfs("you", path.items, deviceMap, &visited, 0);
+    const paths = try _dfs("you", "out", deviceMap, gpa);
 
     std.debug.print("    Num paths = {}\n", .{paths});
 
     std.debug.print("  Day 11 - Part 2\n", .{});
 
-    path.clearRetainingCapacity();
-    try path.appendSlice(gpa, &[_](String){ "dac", "fft", "out" });
-    const paths1 = try _dfs("svr", path.items, deviceMap, &visited, 0);
+    // We happen to know there's no cycles in the input data, so:
+    // - there's no need to track visited nodes, and as such,
+    // - we can cache the count of paths between nodes without worrying about visitation conflicts.
 
-    path.clearRetainingCapacity();
-    try path.appendSlice(gpa, &[_](String){ "fft", "dac", "out" });
-    const paths2 = try _dfs("svr", path.items, deviceMap, &visited, 0);
+    const path1_a = try _dfs("svr", "dac", deviceMap, gpa);
+    const path1_b = try _dfs("dac", "fft", deviceMap, gpa);
+    const path1_c = try _dfs("fft", "out", deviceMap, gpa);
+    const paths1 = path1_a * path1_b * path1_c;
+
+    const path2_a = try _dfs("svr", "fft", deviceMap, gpa);
+    const path2_b = try _dfs("fft", "dac", deviceMap, gpa);
+    const path2_c = try _dfs("dac", "out", deviceMap, gpa);
+    const paths2 = path2_a * path2_b * path2_c;
 
     std.debug.print("    Num paths = {}\n", .{paths1 + paths2});
 }
 
-fn _dfs(node: String, path: []String, graph: std.StringHashMap(std.ArrayList(String)), visited: *std.StringHashMap(void), count: usize) !usize {
-    if (std.mem.eql(u8, node, path[0])) {
-        if (path.len == 1) {
-            return count + 1;
-        }
-        return _dfs(node, path[1..], graph, visited, count);
+fn _dfs(node: String, target: String, graph: std.StringHashMap(std.ArrayList(String)), gpa: std.mem.Allocator) !usize {
+    var cache = std.StringHashMap(usize).init(gpa);
+    defer cache.deinit();
+    return try _dfs_recursive(node, target, graph, &cache, 0);
+}
+
+fn _dfs_recursive(node: String, target: String, graph: std.StringHashMap(std.ArrayList(String)), cache: *std.StringHashMap(usize), count: usize) !usize {
+    if (std.mem.eql(u8, node, target)) {
+        return count + 1;
     }
 
     var result = count;
-    try visited.put(node, {});
 
     const neighbors = graph.getPtr(node);
     if (neighbors) |n| {
         for (n.items) |next| {
-            if (!visited.contains(next)) {
-                result += try _dfs(next, path, graph, visited, count);
+            if (cache.contains(next)) {
+                result += cache.get(next).?;
+            } else {
+                result += try _dfs_recursive(next, target, graph, cache, count);
             }
         }
     }
 
-    _ = visited.remove(node);
+    try cache.put(node, result);
     return result;
 }
 
